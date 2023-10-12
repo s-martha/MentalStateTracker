@@ -1,6 +1,6 @@
 # Трекер психического самочувствия
 ## Презентация
-https://1drv.ms/p/s!AuuLvQbxZTj2j0GMCbLarXJDeqPd?e=vUFrDd
+https://1drv.ms/p/s!AuuLvQbxZTj2j0GMCbLarXJDeqPd?e=vUFrDd - ссылка на редактирование презентации
 
 ## Ожидаемый результат
 Пользователь взаимодействует с Telegram-ботом.
