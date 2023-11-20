@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import db_init
 
 API_TOKEN = '6499145833:AAGtf5zr6HHIHGWAXF_tRMac6UsW1uvMq8M'
 
@@ -26,6 +27,8 @@ async def send_welcome(message: types.Message):
 async def get_time(message: types.Message):
    try:
       if 0 <= int(message.text[6:8]) <= 23 and message.text[8] == ':' and 0 <= int(message.text[9:11]) <= 59 and len(message.text) == 11:
+         e = db_init.MentalState(time=message.text[6:])
+         e.save()
          await message.answer(f'Вы ввели время: {message.text[6:]}')
       else:
          await message.answer(f'Вы ввели некорректное время. Просьба прислать время в указанном формате.')
