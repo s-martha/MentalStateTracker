@@ -15,7 +15,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "application.settings")
 django.setup()
 
 
-from application.accounts.models import MentalState
+from accounts.models import MentalState
 
 get = lambda node_id: MentalState.objects.get(pk=node_id)
 
