@@ -11,11 +11,11 @@ import django
 sys.path.append(
     os.path.join(os.path.dirname(__file__), 'MentalStateTracker')
 )
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "application.settings")
 django.setup()
 
 
-from accounts.models import MentalState
+from application.accounts.models import MentalState
 
 get = lambda node_id: MentalState.objects.get(pk=node_id)
 

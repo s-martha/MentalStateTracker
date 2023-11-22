@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-import db_init
+from .. import db_init
 
 API_TOKEN = '6499145833:AAGtf5zr6HHIHGWAXF_tRMac6UsW1uvMq8M'
 
