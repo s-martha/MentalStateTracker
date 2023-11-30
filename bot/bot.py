@@ -6,6 +6,8 @@ from aiogram.filters.command import CommandObject
 from aiogram import F
 import matplotlib.pyplot as plt
 from aiogram.types import FSInputFile, URLInputFile, BufferedInputFile
+import aioschedule
+
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
@@ -15,6 +17,7 @@ bot = Bot(token="6499145833:AAGtf5zr6HHIHGWAXF_tRMac6UsW1uvMq8M")
 dp = Dispatcher()
 user_data = {}
 user_time = {}
+new_form = True
 kb = [
     [types.KeyboardButton(text="Статистика за месяц")],
     [types.KeyboardButton(text="Статистика за всё время")],
@@ -40,8 +43,9 @@ def PlotParse(dates, values, chat_id, username, when): # len(dates) == len(value
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     global user_data, user_time
+    asyncio.create_task(scheduler(message))
     user_data[message.from_user.id] = []
-    user_time[message.from_user.id] = []
+    user_time[message.from_user.id] = "12:00"
     await message.answer("Привет!\nЯ бот, позволяющий отслеживать психическое самочувствие!", reply_markup=keyboard)
     await message.answer('Каждый день я буду присылать Вам анкету, \nв которой Вы можете отметить своё настроение, \nа в конце каждой недели я отправлю статистику.')
     await message.answer('В какое время Вам удобно получать форму? \nОтправьте время в формате "/time чч:мм" (например "/time 17:50")')
@@ -72,10 +76,12 @@ async def all_stats(message: types.Message):
 
 @dp.message(F.text == "Изменить время отправки формы")
 async def time_change(message: types.Message):
-    try:
-        await message.answer(f'Текущее время - {user_time[message.from_user.id][0]}:{user_time[message.from_user.id][1]}\nОтправьте новое время в формате "/time чч:мм" (например "/time 17:50")')
-    except:
+    if user_time[message.from_user.id] == "12:00":
         await message.answer('В какое время Вам удобно получать форму? \nОтправьте время в формате "/time чч:мм" (например "/time 17:50")')
+    else:
+        await message.answer(f'Текущее время - {user_time[message.from_user.id]}\nОтправьте новое время в формате "/time чч:мм" (например "/time 17:50")')
+
+        
 
 
 @dp.message(Command('time'))
@@ -92,8 +98,8 @@ async def get_time(message: types.Message, command: CommandObject):
         return
     try:
         if 0 <= int(hour) <= 23 and 0 <= int(minutes) <= 59 and len(hour) == len(minutes) == 2:
-            await message.answer(f"Добавлено время:\n{hour}:{minutes}")
-            user_time[message.from_user.id] = [hour, minutes]
+            await message.answer(f"Добавлено время:\n{command.args}")
+            user_time[message.from_user.id] = command.args
 
         else:
             await message.answer("Ошибка: неправильный формат времени")
@@ -120,20 +126,35 @@ def get_keyboard():
 
 @dp.message(F.text == "Отправить форму")
 async def send_form(message: types.Message):
-    await message.answer("Отметьте своё настроение:", reply_markup=get_keyboard())
+    global new_form
+    if new_form:
+        await message.answer("Отметьте своё настроение:", reply_markup=get_keyboard())
+        new_form = False
+
 
 
 @dp.callback_query(F.data.startswith("mood_"))
 async def callbacks_mood(callback: types.CallbackQuery):
-    global user_data
+    global user_data, new_form
     action = callback.data.split("_")[1]
     user_data[callback.from_user.id].append(int(action) + 1)
     await callback.message.answer(f'Вы отметили "{poll_res[int(action)]}"')
     await callback.message.delete()
+    new_form = True
 
 @dp.message()
 async def dont_understand(message: types.Message):
     await message.answer("Я Вас не понимаю")
+
+async def sched_mess(mes: types.Message):
+    await send_form(mes)
+
+async def scheduler(mess: types.Message):
+    aioschedule.every().day.at(user_time[mess.from_user.id]).do(sched_mess, mes=mess)
+    # aioschedule.every().minute.do(sched_mess, mes=mess) #for testing
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
