@@ -1,5 +1,5 @@
 aiogram<4.0
-Django~=4.2.6
 matplotlib~=3.8.2
 python-dotenv==1.0.0
 aioschedule
+psycopg2
