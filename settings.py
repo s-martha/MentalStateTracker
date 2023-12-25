@@ -1,0 +1,6 @@
+TELEGRAM_BOT_TOKEN = '''6499145833:AAGtf5zr6HHIHGWAXF_tRMac6UsW1uvMq8M'''
+
+DATABASE_NAME = '''MentalStateTracker'''
+DATABASE_USERNAME = '''postgres'''
+DATABASE_PASSWORD = '''Q1w2e3r4'''
+DATABASE_HOST = '''localhost'''
